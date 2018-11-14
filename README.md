@@ -1,4 +1,4 @@
-# beam demo mobile app and api server
+# demo MapView mobile app and api server
 ## [ setup ]
 ### backend
 1. git clone the project
