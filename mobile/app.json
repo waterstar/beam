@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "rnapp",
+    "description": "This project is really great.",
+    "slug": "rnapp",
+    "privacy": "public",
+    "sdkVersion": "31.0.0",
+    "platforms": ["ios", "android"],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "extra": {
+      "api_server":"http://192.168.1.161:3000"
+    }
+  }
+}
