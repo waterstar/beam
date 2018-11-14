@@ -1,4 +1,4 @@
-# beam demo mobile app and dummy api server
+# beam demo mobile app and api server
 ## [ setup ]
 ### backend
 1. git clone the project
