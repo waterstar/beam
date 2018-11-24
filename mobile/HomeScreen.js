@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableHighlight, StyleSheet, Text, View, Dimensions } from 'react-native';
-import { MapView, Svg } from 'expo'
+import { Image, ImageBackground, TouchableHighlight, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { MapView, Svg, Location, Permissions } from 'expo'
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import InfoModal from './InfoModal';
 import { connect } from 'react-redux';
@@ -10,7 +10,6 @@ import { getScooters } from './reducer';
 
 
 const { width, height } = Dimensions.get('window');
-const iamhere = { coordinate: { latitude: 1.28380909, longitude: 103.85032855 } };
 
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -25,15 +24,33 @@ class Home extends React.Component {
 
     this.state = {
       currentMarker: {},
-      modalVisible: false
+      modalVisible: false,
+      iamhere: { coordinate: { latitude: 1.28370000, longitude: 103.85032850 } },
+      mapRegion: null
     }
 
     this.markerPress.bind(this);
   }
 
   componentWillMount() {
-    this.props.getScooters();
+    this.getLocationAsync().then(()=>{
+      this.props.getScooters();
+    });
   }
+
+  componentWillUpdate() {
+  }
+
+  getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      alert('Permission to access location was denied. Default location is shown');
+    } 
+    let location = await Location.getCurrentPositionAsync({});
+    const { longitude, latitude } = location.coords;
+    this.setState({ iamhere: { coordinate: { latitude, longitude } }, 
+                    mapRegion: { latitude, longitude, latitudeDelta: 0.0922, longitudeDelta: 0.0421 }});
+  };
 
   getBatteryIconName(bat) {
     switch(true) {
@@ -62,8 +79,39 @@ class Home extends React.Component {
     }
   }
 
+  getImgName(bat) {
+    switch(true) {
+      case (bat >= 0 && bat < 10):
+        return require('./assets/marker-0.png');
+      case (bat >= 10 && bat < 20):
+        return require('./assets/marker-10.png');
+      case (bat >= 20 && bat < 30):
+        return require('./assets/marker-20.png');
+      case (bat >= 30 && bat < 40):
+        return require('./assets/marker-30.png');
+      case (bat >= 40 && bat < 50):
+        return require('./assets/marker-40.png');
+      case (bat >= 50 && bat < 60):
+        return require('./assets/marker-50.png');
+      case (bat >= 60 && bat < 70):
+        return require('./assets/marker-60.png');
+      case (bat >= 70 && bat < 80):
+        return require('./assets/marker-70.png');
+      case (bat >= 80 && bat < 90):
+        return require('./assets/marker-80.png');
+      case (bat >= 90 && bat < 100):
+        return require('./assets/marker-90.png');
+      default:
+        return require('./assets/marker-100.png');
+    }
+  }
+
   markerPress(marker){
-    this.setState({modalVisible:true, currentMarker: marker});
+    Location.getCurrentPositionAsync({}).then((location)=>{
+      const { longitude, latitude } = location.coords;
+      this.setState({ iamhere: { coordinate: { latitude, longitude } }, 
+                      modalVisible:true, currentMarker: marker});
+    });
   }
 
   herePress(marker){
@@ -84,33 +132,31 @@ class Home extends React.Component {
     return (
       <MapView
         style={{ flex: 1 }}
-        initialRegion={{
-          latitude: 1.28409504,
-          longitude: 103.85166405,
-          latitudeDelta: 0.007,
-          longitudeDelta: 0.003,
-        }}>
-        <InfoModal visible={this.state.modalVisible} iamhere={iamhere} marker={this.state.currentMarker}/>
-        <MapView.Marker {...iamhere} 
-          image={require('./assets/you-are-here.png')} 
-          onPress={this.herePress.bind(this)}/>
+        initialRegion={this.state.mapRegion}>
         {/* {this.state.markers.map((marker, i) => { */}
         {this.props.scooters.map((marker, i) => {
           return (
-            <MapView.Marker key={i} {...marker} image={require('./assets/escooter.png')}
+            <MapView.Marker key={i} {...marker}
               onPress={()=>this.markerPress(marker)}>
-                <View style={{paddingLeft:this.padLeft(), paddingTop:this.padTop()}}>
+              <Image source={this.getImgName(marker.battery)} style={{width: 60, height: 60}}>
+                {/* <Text style={{color:'green', fontSize:12, textAlignVertical:'center'}}>{marker.battery}%</Text> */}
+              </Image>
+                {/* <View style={{paddingLeft:this.padLeft(), paddingTop:this.padTop()}}>
                   <Text style={{color:'green'}}>{marker.battery}%</Text>
                   <MaterialCommunityIcons 
                     name={this.getBatteryIconName(marker.battery)} 
                     size={24} 
                     color='green' 
                     />
+                </View> */}
                     {/* style={{ transform: [{ rotate: '-0deg' }] }}/> */}
-                </View>
             </MapView.Marker>
           )
         })}
+        <MapView.Marker {...this.state.iamhere} style={{ zIndex:999 }}
+          image={require('./assets/you-are-here.png')} 
+          onPress={this.herePress.bind(this)}/>
+        <InfoModal visible={this.state.modalVisible} iamhere={this.state.iamhere} marker={this.state.currentMarker}/>
        </MapView>
     );
   }
