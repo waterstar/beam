@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
 
 export default class InfoModal extends Component {
@@ -52,7 +52,23 @@ export default class InfoModal extends Component {
             onBackdropPress={() => this.setState({ modalVisible: false })}
             >
             <View style={styles.modalContent}>
-              <View style={{justifyContent:'center'}}>
+              <View style={{flex:30}}>
+              <TouchableOpacity
+                style={{
+                  borderWidth:2,
+                  borderColor:'rgba(0,0,0)',
+                  alignItems:'center',
+                  justifyContent:'center',
+                  width:80,
+                  height:80,
+                  backgroundColor:'#32CD32',
+                  borderRadius:100,
+                }}
+              >
+              <Text style={{ fontSize:24, fontWeight:'bold'}}>RIDE</Text>
+              </TouchableOpacity>
+              </View>
+              <View style={{justifyContent:'center', flex:70}}>
                 <Text>distance to scooter: {parseFloat(this.calculateDistance()).toFixed(2)}km</Text>
                 <Text>scooter s/n: {this.props.marker.serial}</Text>
               </View>
@@ -69,9 +85,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: 100,
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignItems: 'center',
-    opacity: 0.8,
+    opacity: 0.9,
     backgroundColor: 'white',
     padding: 22,
     justifyContent: 'center'
