@@ -3,13 +3,6 @@ import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Modal from 'react-native-modal';
 
 export default class InfoModal extends Component {
-  state = {
-    modalVisible: false,
-  };
-
-  setModalVisible(visible) {
-    this.setState({modalVisible: visible});
-  }
 
   calculateDistance = () => {
     /** should use google map api to calcuate distance  **/
@@ -38,42 +31,29 @@ export default class InfoModal extends Component {
     }
   }
 
-  componentWillReceiveProps() {
-    this.setState({modalVisible: this.props.visible});
-  }
-
   render() {
     return (
-      <View>
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.modalVisible}
-            onBackdropPress={() => this.setState({ modalVisible: false })}
-            >
-            <View style={styles.modalContent}>
-              <View style={{flex:30}}>
-              <TouchableOpacity
-                style={{
-                  borderWidth:2,
-                  borderColor:'rgba(0,0,0)',
-                  alignItems:'center',
-                  justifyContent:'center',
-                  width:80,
-                  height:80,
-                  backgroundColor:'#32CD32',
-                  borderRadius:100,
-                }}
-              >
-              <Text style={{ fontSize:24, fontWeight:'bold'}}>RIDE</Text>
-              </TouchableOpacity>
-              </View>
-              <View style={{justifyContent:'center', flex:70}}>
-                <Text>distance to scooter: {parseFloat(this.calculateDistance()).toFixed(2)}km</Text>
-                <Text>scooter s/n: {this.props.marker.serial}</Text>
-              </View>
-            </View>
-          </Modal>
+      <View style={[styles.modalContent, {display:this.props.visible}]}>
+        <View style={{flex:30}}>
+        <TouchableOpacity
+          style={{
+            borderWidth:2,
+            borderColor:'rgba(0,0,0)',
+            alignItems:'center',
+            justifyContent:'center',
+            width:80,
+            height:80,
+            backgroundColor:'#32CD32',
+            borderRadius:100,
+          }}
+        >
+        <Text style={{ fontSize:24, fontWeight:'bold'}}>RIDE</Text>
+        </TouchableOpacity>
+        </View>
+        <View style={{justifyContent:'center', flex:70}}>
+          <Text>distance to scooter: {parseFloat(this.calculateDistance()).toFixed(2)}km</Text>
+          <Text>scooter s/n: {this.props.marker.serial}</Text>
+        </View>
       </View>
     );
   }

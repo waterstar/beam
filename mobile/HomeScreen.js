@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, ImageBackground, TouchableHighlight, StyleSheet, Text, View, Dimensions } from 'react-native';
+import { Image, TouchableWithoutFeedback, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { MapView, Svg, Location, Permissions } from 'expo'
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import InfoModal from './InfoModal';
@@ -24,21 +24,29 @@ class Home extends React.Component {
 
     this.state = {
       currentMarker: {},
-      modalVisible: false,
+      modalVisible: 'none',
       iamhere: { coordinate: { latitude: 1.28370000, longitude: 103.85032850 } },
       mapRegion: null
     }
-
+    this.timer = null;
     this.markerPress.bind(this);
   }
 
   componentWillMount() {
     this.getLocationAsync().then(()=>{
       this.props.getScooters();
+
+      this.timer = setInterval(()=>{
+        Location.getCurrentPositionAsync({}).then((location)=>{
+          const { longitude, latitude } = location.coords;
+          this.setState({ iamhere: { coordinate: { latitude, longitude } } });
+        });
+      }, 1000);
     });
   }
 
-  componentWillUpdate() {
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   getLocationAsync = async () => {
@@ -106,12 +114,12 @@ class Home extends React.Component {
     }
   }
 
+  mapPress(){
+    this.setState({modalVisible:'none'});
+  }
+
   markerPress(marker){
-    Location.getCurrentPositionAsync({}).then((location)=>{
-      const { longitude, latitude } = location.coords;
-      this.setState({ iamhere: { coordinate: { latitude, longitude } }, 
-                      modalVisible:true, currentMarker: marker});
-    });
+    this.setState({modalVisible:'flex', currentMarker: marker});
   }
 
   herePress(marker){
@@ -130,24 +138,30 @@ class Home extends React.Component {
 
   render() {
     return (
-      <MapView
-        style={{ flex: 1 }}
-        initialRegion={this.state.mapRegion}>
-        {/* {this.state.markers.map((marker, i) => { */}
-        {this.props.scooters.map((marker, i) => {
-          return (
-            <MapView.Marker key={i} {...marker}
-              onPress={()=>this.markerPress(marker)}>
-              <Image source={this.getImgName(marker.battery)} style={{width: 60, height: 60}}>
-              </Image>
-            </MapView.Marker>
-          )
-        })}
-        <MapView.Marker {...this.state.iamhere} style={{ zIndex:999 }}
-          image={require('./assets/you-are-here.png')} 
-          onPress={this.herePress.bind(this)}/>
-        <InfoModal visible={this.state.modalVisible} iamhere={this.state.iamhere} marker={this.state.currentMarker}/>
-       </MapView>
+      <TouchableWithoutFeedback onPress={this.mapPress.bind(this)}>
+        <View style={{flex:1}}>
+          <MapView
+            style={{ flex: 1 }}
+            initialRegion={this.state.mapRegion}>
+            {/* {this.state.markers.map((marker, i) => { */}
+            {this.props.scooters.map((marker, i) => {
+              return (
+                <MapView.Marker key={i} {...marker}
+                  onPress={()=>this.markerPress(marker)}>
+                  <Image source={this.getImgName(marker.battery)} style={{width: 60, height: 60}}>
+                  </Image>
+                </MapView.Marker>
+              )
+            })}
+            <MapView.Marker {...this.state.iamhere} style={{ zIndex:999 }}
+              image={require('./assets/you-are-here.png')} 
+              onPress={this.herePress.bind(this)}/>
+          </MapView>
+          <InfoModal visible={this.state.modalVisible} 
+                    iamhere={this.state.iamhere} 
+                    marker={this.state.currentMarker}/>
+        </View>
+       </TouchableWithoutFeedback>
     );
   }
 }
