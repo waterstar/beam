@@ -28,9 +28,6 @@ const Stack = createStackNavigator({
       screen: Trips
     },
   },
-  // { 
-  //   headerMode: 'none' 
-  // }
 );
 
 export default class App extends Component {

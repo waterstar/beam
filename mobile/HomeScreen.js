@@ -139,17 +139,7 @@ class Home extends React.Component {
             <MapView.Marker key={i} {...marker}
               onPress={()=>this.markerPress(marker)}>
               <Image source={this.getImgName(marker.battery)} style={{width: 60, height: 60}}>
-                {/* <Text style={{color:'green', fontSize:12, textAlignVertical:'center'}}>{marker.battery}%</Text> */}
               </Image>
-                {/* <View style={{paddingLeft:this.padLeft(), paddingTop:this.padTop()}}>
-                  <Text style={{color:'green'}}>{marker.battery}%</Text>
-                  <MaterialCommunityIcons 
-                    name={this.getBatteryIconName(marker.battery)} 
-                    size={24} 
-                    color='green' 
-                    />
-                </View> */}
-                    {/* style={{ transform: [{ rotate: '-0deg' }] }}/> */}
             </MapView.Marker>
           )
         })}
